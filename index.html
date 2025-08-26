@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Personal Finance Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="dashboard-body">
+
+  <!-- Header -->
+  <header class="header">
+    <h1 class="title">💰 Personal Finance Dashboard</h1>
+    <button class="btn" onclick="openForm()">+ Add Expense</button>
+  </header>
+
+  <!-- Dashboard -->
+  <main class="dashboard">
+    <section class="card">
+      <h2 class="card-title">Expense Breakdown</h2>
+      <canvas id="pieChart"></canvas>
+    </section>
+
+    <section class="card">
+      <h2 class="card-title">Monthly Spending Trend</h2>
+      <canvas id="lineChart"></canvas>
+    </section>
+  </main>
+
+  <!-- Add Expense Form (hidden by default) -->
+  <div id="expenseForm" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center">
+    <div class="bg-white rounded-xl shadow-lg p-6 w-80">
+      <h2 class="text-xl font-semibold mb-4">Add New Expense</h2>
+      <input id="category" type="text" placeholder="Category" class="w-full mb-3 p-2 border rounded"/>
+      <input id="amount" type="number" placeholder="Amount" class="w-full mb-3 p-2 border rounded"/>
+      <div class="flex justify-end gap-2">
+        <button onclick="closeForm()" class="px-3 py-1 bg-gray-300 rounded">Cancel</button>
+        <button onclick="addExpense()" class="px-3 py-1 bg-indigo-600 text-white rounded">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Expense Data (dynamic)
+    let categories = ['Food', 'Transport', 'Entertainment', 'Shopping', 'Bills'];
+    let amounts = [400, 200, 300, 250, 150];
+
+    // Pie Chart
+    const pieCtx = document.getElementById('pieChart');
+    const pieChart = new Chart(pieCtx, {
+      type: 'pie',
+      data: {
+        labels: categories,
+        datasets: [{
+          data: amounts,
+          backgroundColor: ['#6366F1', '#22C55E', '#FACC15', '#EF4444', '#3B82F6'],
+        }]
+      }
+    });
+
+    // Line Chart
+    const lineCtx = document.getElementById('lineChart');
+    const lineChart = new Chart(lineCtx, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{
+          label: 'Amount Spent ($)',
+          data: [800, 600, 950, 700, 400, 850],
+          borderColor: '#6366F1',
+          backgroundColor: 'rgba(99,102,241,0.2)',
+          tension: 0.4,
+          fill: true
+        }]
+      }
+    });
+
+    // Open & Close Form
+    function openForm() {
+      document.getElementById('expenseForm').classList.remove('hidden');
+    }
+    function closeForm() {
+      document.getElementById('expenseForm').classList.add('hidden');
+    }
+
+    // Add Expense
+    function addExpense() {
+      const category = document.getElementById('category').value;
+      const amount = parseInt(document.getElementById('amount').value);
+
+      if(category && amount) {
+        // Add new data
+        categories.push(category);
+        amounts.push(amount);
+
+        // Update Pie Chart
+        pieChart.data.labels = categories;
+        pieChart.data.datasets[0].data = amounts;
+        pieChart.update();
+
+        // Update Line Chart (just add to last month for demo)
+        lineChart.data.datasets[0].data[lineChart.data.datasets[0].data.length-1] += amount;
+        lineChart.update();
+
+        closeForm();
+      }
+    }
+  </script>
+
+</body>
+</html>
